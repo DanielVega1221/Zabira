@@ -369,7 +369,7 @@ function App() {
       </section>
 
       <section className="space" id="espacio">
-        <img src={studioImg} className="space__bg" alt="" />
+        <img src={studioImg} className="space__bg" alt="" loading="lazy" decoding="async" />
         <div className="space__overlay" />
         <div className="section-inner space__content">
           <p className="section-tag light centered">El estudio</p>

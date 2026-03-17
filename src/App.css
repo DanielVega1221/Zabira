@@ -1219,8 +1219,7 @@
 .space__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(43, 43, 43, 0.58);
-  backdrop-filter: blur(2px);
+  background: rgba(43, 43, 43, 0.62);
 }
 
 .space__content {
