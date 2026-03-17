@@ -214,9 +214,6 @@ function App() {
             <div className="class-card" style={{ backgroundImage: `url(${card1Img})` }}>
               <div className="class-card__overlay" />
               <div className="class-card__content">
-                <div className="class-card__icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-                </div>
                 <h3>Pilates Reformer</h3>
                 <p>Trabajo completo con m&#225;quinas para ganar fuerza, control y movilidad.</p>
               </div>
@@ -224,9 +221,6 @@ function App() {
             <div className="class-card" style={{ backgroundImage: `url(${card2Img})` }}>
               <div className="class-card__overlay" />
               <div className="class-card__content">
-                <div className="class-card__icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-                </div>
                 <h3>Stretching &amp; Movilidad</h3>
                 <p>Liber&#225; tensiones, mejor&#225; tu flexibilidad y recuper&#225; amplitud de movimiento.</p>
               </div>
@@ -234,9 +228,6 @@ function App() {
             <div className="class-card" style={{ backgroundImage: `url(${card3Img})` }}>
               <div className="class-card__overlay" />
               <div className="class-card__content">
-                <div className="class-card__icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </div>
                 <h3>Clases Personalizadas</h3>
                 <p>Entrenamiento adaptado a tus objetivos, historial y ritmo de avance.</p>
               </div>
