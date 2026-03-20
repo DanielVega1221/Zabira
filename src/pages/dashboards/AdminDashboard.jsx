@@ -260,9 +260,139 @@ function PanelTiposClase({ onCambio }) {
   )
 }
 
+// ─── PanelInstructores (compartido, accesible desde admin y master) ───────────
+function PanelInstructores({ rutaBase = '/usuarios/instructores' }) {
+  const [instructores, setInstructores] = useState([])
+  const [cargando, setCargando] = useState(true)
+  const [mostrarForm, setMostrarForm] = useState(false)
+  const [editando, setEditando] = useState(null)
+  const [form, setForm] = useState({ nombre: '', apellido: '', email: '', telefono: '', password: '' })
+  const [error, setError] = useState('')
+  const [guardando, setGuardando] = useState(false)
+
+  const cargar = useCallback(async () => {
+    try {
+      const res = await api.get('/usuarios?roles=instructor')
+      setInstructores(res.data.usuarios || [])
+    } finally { setCargando(false) }
+  }, [])
+
+  useEffect(() => { cargar() }, [cargar])
+
+  const abrirNuevo = () => {
+    setEditando(null)
+    setForm({ nombre: '', apellido: '', email: '', telefono: '', password: '' })
+    setError('')
+    setMostrarForm(true)
+  }
+
+  const abrirEditar = (inst) => {
+    setEditando(inst)
+    setForm({ nombre: inst.nombre, apellido: inst.apellido, email: inst.email, telefono: inst.telefono || '', password: '' })
+    setError('')
+    setMostrarForm(true)
+  }
+
+  const cerrar = () => { setMostrarForm(false); setEditando(null) }
+  const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))
+
+  const handleSubmit = async e => {
+    e.preventDefault()
+    setError('')
+    setGuardando(true)
+    try {
+      const payload = { nombre: form.nombre, apellido: form.apellido, email: form.email, telefono: form.telefono }
+      if (!editando || form.password) payload.password = form.password
+      if (editando) {
+        await api.put(`${rutaBase}/${editando._id}`, payload)
+      } else {
+        await api.post(rutaBase, payload)
+      }
+      cerrar(); cargar()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al guardar')
+    } finally { setGuardando(false) }
+  }
+
+  const eliminar = async (inst) => {
+    if (!window.confirm(`¿Eliminar a ${inst.nombre} ${inst.apellido}? Esta acción no se puede deshacer.`)) return
+    try { await api.delete(`${rutaBase}/${inst._id}`); cargar() }
+    catch (e) { console.error(e) }
+  }
+
+  return (
+    <section className="dashboard__section">
+      <div className="dashboard__section-header">
+        <h2 className="dashboard__section-title">Instructores</h2>
+        <button className="admin-btn-add" onClick={abrirNuevo}>+ Nuevo instructor</button>
+      </div>
+
+      {mostrarForm && (
+        <form className="admin-form" onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
+          <div className="admin-form__grid">
+            <div className="auth-form__field">
+              <label className="auth-form__label">Nombre</label>
+              <input className="auth-form__input" name="nombre" value={form.nombre} onChange={handleChange} required />
+            </div>
+            <div className="auth-form__field">
+              <label className="auth-form__label">Apellido</label>
+              <input className="auth-form__input" name="apellido" value={form.apellido} onChange={handleChange} required />
+            </div>
+            <div className="auth-form__field">
+              <label className="auth-form__label">Email</label>
+              <input className="auth-form__input" type="email" name="email" value={form.email} onChange={handleChange} required />
+            </div>
+            <div className="auth-form__field">
+              <label className="auth-form__label">Teléfono <span className="auth-form__optional">(opcional)</span></label>
+              <input className="auth-form__input" name="telefono" value={form.telefono} onChange={handleChange} />
+            </div>
+            <div className="auth-form__field">
+              <label className="auth-form__label">
+                Contraseña {editando && <span className="auth-form__optional">(dejar vacío para no cambiar)</span>}
+              </label>
+              <input className="auth-form__input" type="password" name="password" value={form.password}
+                onChange={handleChange} {...(!editando && { required: true })} minLength={6} />
+            </div>
+          </div>
+          {error && <p className="auth-form__error">{error}</p>}
+          <div className="admin-form__actions">
+            <button type="submit" className="auth-form__btn" style={{ maxWidth: 180 }} disabled={guardando}>
+              {guardando ? 'Guardando…' : editando ? 'Guardar cambios' : 'Crear instructor'}
+            </button>
+            <button type="button" className="admin-form__cancel" onClick={cerrar}>Cancelar</button>
+          </div>
+        </form>
+      )}
+
+      {cargando ? (
+        <p className="dashboard__loading">Cargando…</p>
+      ) : instructores.length === 0 ? (
+        <p className="dashboard__empty">No hay instructores registrados.</p>
+      ) : (
+        <div className="tipos-lista">
+          {instructores.map(inst => (
+            <div key={inst._id} className="tipo-card">
+              <div className="tipo-card__info">
+                <strong>{inst.nombre} {inst.apellido}</strong>
+                <span>{inst.email}</span>
+                {inst.telefono && <span>{inst.telefono}</span>}
+              </div>
+              <div className="tipo-card__acciones">
+                <button className="turno-card__btn" onClick={() => abrirEditar(inst)}>Editar</button>
+                <button className="turno-card__btn turno-card__btn--cancelar" onClick={() => eliminar(inst)}>Eliminar</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
 const TABS = [
   { id: 'turnos', label: 'Turnos' },
   { id: 'tipos', label: 'Tipos de clase' },
+  { id: 'instructores', label: 'Instructores' },
   { id: 'membresias', label: 'Membresías' },
 ]
 
@@ -461,6 +591,9 @@ export default function AdminDashboard() {
 
             {/* ── TAB: TIPOS DE CLASE ─────────────────────────────── */}
             {tab === 'tipos' && <PanelTiposClase onCambio={cargarTiposClase} />}
+
+            {/* ── TAB: INSTRUCTORES ───────────────────────────────── */}
+            {tab === 'instructores' && <PanelInstructores />}
 
             {/* ── TAB: MEMBRESÍAS ─────────────────────────────────── */}
             {tab === 'membresias' && (

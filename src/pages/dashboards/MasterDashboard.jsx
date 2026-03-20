@@ -252,79 +252,67 @@ function PanelTiposClase({ onCambio }) {
   )
 }
 
-// ─── PanelInstructores ────────────────────────────────────────────────────────
-function PanelInstructores() {
-  const [instructores, setInstructores] = useState([])
+// ─── PanelUsuariosCRUD — genérico para instructores y admins ─────────────────
+function PanelUsuariosCRUD({ titulo, rolListar, rutaApi, labelNuevo }) {
+  const [usuarios, setUsuarios] = useState([])
   const [cargando, setCargando] = useState(true)
   const [mostrarForm, setMostrarForm] = useState(false)
-  const [editando, setEditando] = useState(null) // null = nuevo, objeto = editar
+  const [editando, setEditando] = useState(null)
   const [form, setForm] = useState({ nombre: '', apellido: '', email: '', telefono: '', password: '' })
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
 
   const cargar = useCallback(async () => {
     try {
-      const res = await api.get('/usuarios?roles=instructor')
-      setInstructores(res.data.usuarios || [])
-    } finally {
-      setCargando(false)
-    }
-  }, [])
+      const res = await api.get(`/usuarios?roles=${rolListar}`)
+      setUsuarios(res.data.usuarios || [])
+    } finally { setCargando(false) }
+  }, [rolListar])
 
   useEffect(() => { cargar() }, [cargar])
 
   const abrirNuevo = () => {
     setEditando(null)
     setForm({ nombre: '', apellido: '', email: '', telefono: '', password: '' })
-    setError('')
-    setMostrarForm(true)
+    setError(''); setMostrarForm(true)
   }
 
-  const abrirEditar = (inst) => {
-    setEditando(inst)
-    setForm({ nombre: inst.nombre, apellido: inst.apellido, email: inst.email, telefono: inst.telefono || '', password: '' })
-    setError('')
-    setMostrarForm(true)
+  const abrirEditar = (u) => {
+    setEditando(u)
+    setForm({ nombre: u.nombre, apellido: u.apellido, email: u.email, telefono: u.telefono || '', password: '' })
+    setError(''); setMostrarForm(true)
   }
 
   const cerrar = () => { setMostrarForm(false); setEditando(null) }
-
   const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))
 
   const handleSubmit = async e => {
-    e.preventDefault()
-    setError('')
-    setGuardando(true)
+    e.preventDefault(); setError(''); setGuardando(true)
     try {
       const payload = { nombre: form.nombre, apellido: form.apellido, email: form.email, telefono: form.telefono }
       if (!editando || form.password) payload.password = form.password
       if (editando) {
-        await api.put(`/usuarios/instructores/${editando._id}`, payload)
+        await api.put(`${rutaApi}/${editando._id}`, payload)
       } else {
-        await api.post('/usuarios/instructores', payload)
+        await api.post(rutaApi, payload)
       }
-      cerrar()
-      cargar()
+      cerrar(); cargar()
     } catch (err) {
       setError(err.response?.data?.message || 'Error al guardar')
-    } finally {
-      setGuardando(false)
-    }
+    } finally { setGuardando(false) }
   }
 
-  const eliminar = async (inst) => {
-    if (!window.confirm(`¿Eliminar a ${inst.nombre} ${inst.apellido}? Esta acción no se puede deshacer.`)) return
-    try {
-      await api.delete(`/usuarios/instructores/${inst._id}`)
-      cargar()
-    } catch (e) { console.error(e) }
+  const eliminar = async (u) => {
+    if (!window.confirm(`¿Eliminar a ${u.nombre} ${u.apellido}? Esta acción no se puede deshacer.`)) return
+    try { await api.delete(`${rutaApi}/${u._id}`); cargar() }
+    catch (e) { console.error(e) }
   }
 
   return (
     <section className="dashboard__section">
       <div className="dashboard__section-header">
-        <h2 className="dashboard__section-title">Instructores</h2>
-        <button className="admin-btn-add" onClick={abrirNuevo}>+ Nuevo instructor</button>
+        <h2 className="dashboard__section-title">{titulo}</h2>
+        <button className="admin-btn-add" onClick={abrirNuevo}>{labelNuevo}</button>
       </div>
 
       {mostrarForm && (
@@ -357,7 +345,7 @@ function PanelInstructores() {
           {error && <p className="auth-form__error">{error}</p>}
           <div className="admin-form__actions">
             <button type="submit" className="auth-form__btn" style={{ maxWidth: 180 }} disabled={guardando}>
-              {guardando ? 'Guardando…' : editando ? 'Guardar cambios' : 'Crear instructor'}
+              {guardando ? 'Guardando…' : editando ? 'Guardar cambios' : labelNuevo}
             </button>
             <button type="button" className="admin-form__cancel" onClick={cerrar}>Cancelar</button>
           </div>
@@ -366,20 +354,20 @@ function PanelInstructores() {
 
       {cargando ? (
         <p className="dashboard__loading">Cargando…</p>
-      ) : instructores.length === 0 ? (
-        <p className="dashboard__empty">No hay instructores registrados.</p>
+      ) : usuarios.length === 0 ? (
+        <p className="dashboard__empty">No hay {titulo.toLowerCase()} registrados.</p>
       ) : (
         <div className="tipos-lista">
-          {instructores.map(inst => (
-            <div key={inst._id} className="tipo-card">
+          {usuarios.map(u => (
+            <div key={u._id} className="tipo-card">
               <div className="tipo-card__info">
-                <strong>{inst.nombre} {inst.apellido}</strong>
-                <span>{inst.email}</span>
-                {inst.telefono && <span>{inst.telefono}</span>}
+                <strong>{u.nombre} {u.apellido}</strong>
+                <span>{u.email}</span>
+                {u.telefono && <span>{u.telefono}</span>}
               </div>
               <div className="tipo-card__acciones">
-                <button className="turno-card__btn" onClick={() => abrirEditar(inst)}>Editar</button>
-                <button className="turno-card__btn turno-card__btn--cancelar" onClick={() => eliminar(inst)}>Eliminar</button>
+                <button className="turno-card__btn" onClick={() => abrirEditar(u)}>Editar</button>
+                <button className="turno-card__btn turno-card__btn--cancelar" onClick={() => eliminar(u)}>Eliminar</button>
               </div>
             </div>
           ))}
@@ -394,6 +382,7 @@ const TABS = [
   { id: 'turnos', label: 'Turnos' },
   { id: 'tipos', label: 'Tipos de clase' },
   { id: 'instructores', label: 'Instructores' },
+  { id: 'admins', label: 'Admins' },
   { id: 'membresias', label: 'Membresías' },
 ]
 
@@ -589,7 +578,24 @@ export default function MasterDashboard() {
             {tab === 'tipos' && <PanelTiposClase onCambio={cargarTiposClase} />}
 
             {/* ── TAB: INSTRUCTORES ───────────────────────────────── */}
-            {tab === 'instructores' && <PanelInstructores />}
+            {tab === 'instructores' && (
+              <PanelUsuariosCRUD
+                titulo="Instructores"
+                rolListar="instructor"
+                rutaApi="/usuarios/instructores"
+                labelNuevo="+ Nuevo instructor"
+              />
+            )}
+
+            {/* ── TAB: ADMINS ─────────────────────────────────────── */}
+            {tab === 'admins' && (
+              <PanelUsuariosCRUD
+                titulo="Administradores"
+                rolListar="admin"
+                rutaApi="/usuarios/admins"
+                labelNuevo="+ Nuevo admin"
+              />
+            )}
 
             {/* ── TAB: MEMBRESÍAS ─────────────────────────────────── */}
             {tab === 'membresias' && (
