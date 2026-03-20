@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import '../App.css'
-import entrarImg from '../assets/EntrarImagen.jpg'
-import unirseImg from '../assets/unirseImagen.png'
+import entrarImg from '../assets/EntrarImagen.webp'
+import unirseImg from '../assets/unirseImagen.webp'
 
 export default function PreLogin() {
   return (

@@ -1868,7 +1868,10 @@
   padding: 80px 0;
 }
 
-.dashboard__welcome .prelogin__tag {
+.dashboard__welcome .prelogin__tag,
+.dashboard__body .prelogin__tag,
+.dashboard__content .prelogin__tag,
+.dashboard__main .prelogin__tag {
   color: var(--accent);
 }
 
