@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import heroImg from './assets/HeroLanding.webp'
 import experienciaImg from './assets/experiencia.webp'
@@ -58,29 +59,31 @@ function App() {
           </button>
         </div>
 
-        {menuOpen && (
-          <div className="navbar__overlay">
-            <button className="navbar__overlay-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menu">
-              <span /><span />
-            </button>
-            <span className="navbar__overlay-logo">Zabira<em>Studio</em></span>
-            <nav className="navbar__overlay-nav">
-              <a href="#clases"       onClick={() => setMenuOpen(false)}>Clases</a>
-              <a href="#reservar"     onClick={() => setMenuOpen(false)}>C&#243;mo funciona</a>
-              <a href="#precios"      onClick={() => setMenuOpen(false)}>Membres&#237;a</a>
-              <a href="#espacio"      onClick={() => setMenuOpen(false)}>El Estudio</a>
-              <a href="#contacto"     onClick={() => setMenuOpen(false)}>Contacto</a>
-            </nav>
-            <a
-              href="#"
-              className="navbar__overlay-cta"
-              onClick={e => { e.preventDefault(); setMenuOpen(false); navigate('/pre-login') }}
-            >
-              Reservar
-            </a>
-          </div>
-        )}
       </header>
+
+      {menuOpen && createPortal(
+        <div className="navbar__overlay">
+          <button className="navbar__overlay-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menu">
+            <span /><span />
+          </button>
+          <span className="navbar__overlay-logo">Zabira<em>Studio</em></span>
+          <nav className="navbar__overlay-nav">
+            <a href="#clases"       onClick={() => setMenuOpen(false)}>Clases</a>
+            <a href="#reservar"     onClick={() => setMenuOpen(false)}>C&#243;mo funciona</a>
+            <a href="#precios"      onClick={() => setMenuOpen(false)}>Membres&#237;a</a>
+            <a href="#espacio"      onClick={() => setMenuOpen(false)}>El Estudio</a>
+            <a href="#contacto"     onClick={() => setMenuOpen(false)}>Contacto</a>
+          </nav>
+          <a
+            href="#"
+            className="navbar__overlay-cta"
+            onClick={e => { e.preventDefault(); setMenuOpen(false); navigate('/pre-login') }}
+          >
+            Reservar
+          </a>
+        </div>,
+        document.body
+      )}
 
       <section className="hero">
         <div className="hero__bg" aria-hidden="true">
