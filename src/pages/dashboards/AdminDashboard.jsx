@@ -389,11 +389,133 @@ function PanelInstructores({ rutaBase = '/usuarios/instructores' }) {
   )
 }
 
+// ─── Subcomponente: Panel de Métricas ─────────────────────────────────────
+function PanelMetricas() {
+  const [data, setData] = useState(null)
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    api.get('/metricas')
+      .then(r => setData(r.data))
+      .catch(() => setError('No se pudieron cargar las métricas.'))
+      .finally(() => setCargando(false))
+  }, [])
+
+  if (cargando) return <p className="dashboard__section-desc">Cargando métricas...</p>
+  if (error) return <p className="metricas-error">{error}</p>
+
+  const { resumen, ingresosChart, turnosPorTipo, turnosPorInstructor, ocupacionPromedio } = data
+
+  const maxIngreso = Math.max(...ingresosChart.map(m => m.total), 1)
+
+  return (
+    <section className="dashboard__section">
+      <h2 className="dashboard__section-title">Métricas del estudio</h2>
+
+      {/* Tarjetas resumen */}
+      <div className="metricas-grid">
+        <div className="metrica-card">
+          <span className="metrica-card__valor">{resumen.totalClientes}</span>
+          <span className="metrica-card__label">Alumnos</span>
+        </div>
+        <div className="metrica-card">
+          <span className="metrica-card__valor">{resumen.totalInstructores}</span>
+          <span className="metrica-card__label">Instructores</span>
+        </div>
+        <div className="metrica-card">
+          <span className="metrica-card__valor">{resumen.turnosProximos}</span>
+          <span className="metrica-card__label">Turnos próximos</span>
+        </div>
+        <div className="metrica-card">
+          <span className="metrica-card__valor">{resumen.membresiasActivas}</span>
+          <span className="metrica-card__label">Membresías activas</span>
+        </div>
+        <div className="metrica-card">
+          <span className="metrica-card__valor">{resumen.nuevosClientes}</span>
+          <span className="metrica-card__label">Nuevos alumnos (30d)</span>
+        </div>
+        <div className="metrica-card metrica-card--accent">
+          <span className="metrica-card__valor">
+            ${resumen.totalMesActual?.toLocaleString('es-AR') ?? '0'}
+          </span>
+          <span className="metrica-card__label">Ingresos del mes</span>
+        </div>
+      </div>
+
+      {/* Gráfico de ingresos últimos 6 meses */}
+      <div className="metricas-bloque">
+        <h3 className="metricas-subtitulo">Ingresos últimos 6 meses</h3>
+        <div className="metricas-chart">
+          {ingresosChart.map((m, i) => (
+            <div key={i} className="metricas-chart__col">
+              <span className="metricas-chart__monto">
+                ${m.total?.toLocaleString('es-AR') ?? '0'}
+              </span>
+              <div className="metricas-chart__barra-wrap">
+                <div
+                  className="metricas-chart__barra"
+                  style={{ height: `${Math.round((m.total / maxIngreso) * 100)}%` }}
+                />
+              </div>
+              <span className="metricas-chart__mes">{m.mes}</span>
+              <span className="metricas-chart__count">{m.cantidad} pago{m.cantidad !== 1 ? 's' : ''}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Ocupación promedio */}
+      <div className="metricas-bloque">
+        <h3 className="metricas-subtitulo">Ocupación promedio (próximos 30 días)</h3>
+        <div className="metricas-progreso-wrap">
+          <div className="metricas-progreso">
+            <div
+              className="metricas-progreso__fill"
+              style={{ width: `${ocupacionPromedio}%` }}
+            />
+          </div>
+          <span className="metricas-progreso__label">{ocupacionPromedio}%</span>
+        </div>
+      </div>
+
+      <div className="metricas-dos-col">
+        {/* Top tipos de clase */}
+        <div className="metricas-bloque">
+          <h3 className="metricas-subtitulo">Clases más populares</h3>
+          <ul className="metricas-lista">
+            {turnosPorTipo.map((t, i) => (
+              <li key={i} className="metricas-lista__item">
+                <span className="metricas-lista__nombre">{t._id || 'Sin nombre'}</span>
+                <span className="metricas-lista__badge">{t.totalTurnos} turno{t.totalTurnos !== 1 ? 's' : ''} · {t.totalInscriptos} inscripto{t.totalInscriptos !== 1 ? 's' : ''}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Top instructores */}
+        <div className="metricas-bloque">
+          <h3 className="metricas-subtitulo">Instructores más activos</h3>
+          <ul className="metricas-lista">
+            {turnosPorInstructor.map((inst, i) => (
+              <li key={i} className="metricas-lista__item">
+                <span className="metricas-lista__nombre">{inst.nombre} {inst.apellido}</span>
+                <span className="metricas-lista__badge">{inst.totalTurnos} turno{inst.totalTurnos !== 1 ? 's' : ''}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 const TABS = [
   { id: 'turnos', label: 'Turnos' },
   { id: 'tipos', label: 'Tipos de clase' },
   { id: 'instructores', label: 'Instructores' },
   { id: 'membresias', label: 'Membresías' },
+  { id: 'metricas', label: 'Métricas' },
 ]
 
 export default function AdminDashboard() {
@@ -605,6 +727,9 @@ export default function AdminDashboard() {
                 <FormMembresia />
               </section>
             )}
+
+            {/* ── TAB: MÉTRICAS ────────────────────────────────────── */}
+            {tab === 'metricas' && <PanelMetricas />}
           </>
         )}
       </main>

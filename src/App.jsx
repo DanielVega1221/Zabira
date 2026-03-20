@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import heroImg from './assets/HeroLanding.webp'
 import experienciaImg from './assets/experiencia.webp'
 import card1Img from './assets/card1.webp'
@@ -9,6 +10,7 @@ import studioImg from './assets/studio.webp'
 import './App.css'
 
 function App() {
+  const navigate = useNavigate()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -18,13 +20,8 @@ function App() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [menuOpen])
-
   return (
-    <div>
+    <div className="page-transition">
 
       <header className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}>
         <div className="navbar__inner">
@@ -40,7 +37,7 @@ function App() {
             <a href="#contacto">Contacto</a>
           </nav>
 
-          <a href="#reservar" className="navbar__cta">
+          <a href="#" onClick={e => { e.preventDefault(); navigate('/pre-login') }} className="navbar__cta">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
@@ -61,30 +58,29 @@ function App() {
           </button>
         </div>
 
+        {menuOpen && (
+          <div className="navbar__overlay">
+            <button className="navbar__overlay-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menu">
+              <span /><span />
+            </button>
+            <span className="navbar__overlay-logo">Zabira<em>Studio</em></span>
+            <nav className="navbar__overlay-nav">
+              <a href="#clases"       onClick={() => setMenuOpen(false)}>Clases</a>
+              <a href="#reservar"     onClick={() => setMenuOpen(false)}>C&#243;mo funciona</a>
+              <a href="#precios"      onClick={() => setMenuOpen(false)}>Membres&#237;a</a>
+              <a href="#espacio"      onClick={() => setMenuOpen(false)}>El Estudio</a>
+              <a href="#contacto"     onClick={() => setMenuOpen(false)}>Contacto</a>
+            </nav>
+            <a
+              href="#"
+              className="navbar__overlay-cta"
+              onClick={e => { e.preventDefault(); setMenuOpen(false); navigate('/pre-login') }}
+            >
+              Reservar
+            </a>
+          </div>
+        )}
       </header>
-
-      {menuOpen && (
-        <div className="navbar__overlay">
-          <button className="navbar__overlay-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menu">
-            <span /><span />
-          </button>
-          <span className="navbar__overlay-logo">Zabira<em>Studio</em></span>
-          <nav className="navbar__overlay-nav">
-            <a href="#clases"       onClick={() => setMenuOpen(false)}>Clases</a>
-            <a href="#reservar"     onClick={() => setMenuOpen(false)}>C&#243;mo funciona</a>
-            <a href="#precios"      onClick={() => setMenuOpen(false)}>Membres&#237;a</a>
-            <a href="#espacio"      onClick={() => setMenuOpen(false)}>El Estudio</a>
-            <a href="#contacto"     onClick={() => setMenuOpen(false)}>Contacto</a>
-          </nav>
-          <a
-            href="#reservar"
-            className="navbar__overlay-cta"
-            onClick={() => setMenuOpen(false)}
-          >
-            Reservar
-          </a>
-        </div>
-      )}
 
       <section className="hero">
         <div className="hero__bg" aria-hidden="true">
@@ -104,7 +100,7 @@ function App() {
             fuerza y bienestar, sin impacto y con seguimiento real.
           </p>
           <div className="hero__actions">
-            <a href="#" onClick={e => e.preventDefault()} className="btn--hero">Reservar clase</a>
+            <a href="#" onClick={e => { e.preventDefault(); navigate('/pre-login') }} className="btn--hero">Reservar clase</a>
             <a href="#" onClick={e => e.preventDefault()} className="btn--hero btn--hero-ghost">Ver horarios</a>
           </div>
         </div>
@@ -220,6 +216,9 @@ function App() {
             <div className="class-card" style={{ backgroundImage: `url(${card1Img})` }}>
               <div className="class-card__overlay" />
               <div className="class-card__content">
+                <div className="class-card__icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+                </div>
                 <h3>Pilates Reformer</h3>
                 <p>Trabajo completo con m&#225;quinas para ganar fuerza, control y movilidad.</p>
               </div>
@@ -227,6 +226,9 @@ function App() {
             <div className="class-card" style={{ backgroundImage: `url(${card2Img})` }}>
               <div className="class-card__overlay" />
               <div className="class-card__content">
+                <div className="class-card__icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                </div>
                 <h3>Stretching &amp; Movilidad</h3>
                 <p>Liber&#225; tensiones, mejor&#225; tu flexibilidad y recuper&#225; amplitud de movimiento.</p>
               </div>
@@ -234,6 +236,9 @@ function App() {
             <div className="class-card" style={{ backgroundImage: `url(${card3Img})` }}>
               <div className="class-card__overlay" />
               <div className="class-card__content">
+                <div className="class-card__icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
                 <h3>Clases Personalizadas</h3>
                 <p>Entrenamiento adaptado a tus objetivos, historial y ritmo de avance.</p>
               </div>
@@ -270,7 +275,7 @@ function App() {
                 Seguimiento de tus clases
               </li>
             </ul>
-            <a href="#" onClick={e => e.preventDefault()} className="btn--system">Reservar ahora</a>
+            <a href="#" onClick={e => { e.preventDefault(); navigate('/pre-login') }} className="btn--system">Reservar ahora</a>
           </div>
           <div className="system__steps">
             <div className="system__step">
@@ -375,7 +380,7 @@ function App() {
       </section>
 
       <section className="space" id="espacio">
-        <img src={studioImg} className="space__bg" alt="" loading="lazy" decoding="async" />
+        <img src={studioImg} className="space__bg" alt="" />
         <div className="space__overlay" />
         <div className="section-inner space__content">
           <p className="section-tag light centered">El estudio</p>
@@ -395,7 +400,7 @@ function App() {
           <p className="section-tag centered">Primera clase gratuita</p>
           <h2 className="section-title centered">Empez&#225; hoy</h2>
           <p className="section-subtitle centered">Tu cuerpo lo va a notar desde la primera clase.<br />Grupos reducidos, seguimiento personalizado.</p>
-          <a href="#" onClick={e => e.preventDefault()} className="btn--cta-final">Reservar clase <span className="btn__arrow">&#8594;</span></a>
+          <a href="#" onClick={e => { e.preventDefault(); navigate('/pre-login') }} className="btn--cta-final">Reservar clase <span className="btn__arrow">&#8594;</span></a>
           <p className="cta-final__note">Sin cargo &#183; Cancel&#225;s cuando quer&#233;s</p>
         </div>
       </section>
