@@ -101,7 +101,6 @@ function App() {
           </p>
           <div className="hero__actions">
             <a href="#" onClick={e => { e.preventDefault(); navigate('/pre-login') }} className="btn--hero">Reservar clase</a>
-            <a href="#" onClick={e => e.preventDefault()} className="btn--hero btn--hero-ghost">Ver horarios</a>
           </div>
         </div>
 
@@ -340,7 +339,7 @@ function App() {
                   Seguimiento personalizado de tu progreso
                 </li>
               </ul>
-              <a href="#" onClick={e => e.preventDefault()} className="btn--plan-featured">Quiero empezar</a>
+              <a href="#" onClick={e => { e.preventDefault(); navigate('/registro') }} className="btn--plan-featured">Quiero empezar</a>
             </div>
           </div>
         </div>
