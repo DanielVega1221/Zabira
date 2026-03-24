@@ -4,6 +4,8 @@ import api from '../services/api'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
+  // El usuario se hidrata desde localStorage solo para el nombre/rol (no sensible).
+  // El token real nunca sale de la cookie httpOnly.
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('zabira_user')
@@ -12,18 +14,16 @@ export function AuthProvider({ children }) {
       return null
     }
   })
-  // Si hay token guardado, arrancamos en cargando para verificarlo
-  const [loading, setLoading] = useState(() => !!localStorage.getItem('zabira_token'))
+  // Siempre verificamos con el servidor al montar para validar que la cookie sea válida
+  const [loading, setLoading] = useState(true)
 
-  // Verificar token al montar
   useEffect(() => {
-    const token = localStorage.getItem('zabira_token')
-    if (!token) return
-
     api.get('/auth/me')
-      .then(res => setUser(res.data.user))
+      .then(res => {
+        setUser(res.data.user)
+        localStorage.setItem('zabira_user', JSON.stringify(res.data.user))
+      })
       .catch(() => {
-        localStorage.removeItem('zabira_token')
         localStorage.removeItem('zabira_user')
         setUser(null)
       })
@@ -32,8 +32,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password })
-    const { token, user: userData } = res.data
-    localStorage.setItem('zabira_token', token)
+    const { user: userData } = res.data
     localStorage.setItem('zabira_user', JSON.stringify(userData))
     setUser(userData)
     return userData
@@ -41,15 +40,18 @@ export function AuthProvider({ children }) {
 
   const register = async (formData) => {
     const res = await api.post('/auth/register', formData)
-    const { token, user: userData } = res.data
-    localStorage.setItem('zabira_token', token)
+    const { user: userData } = res.data
     localStorage.setItem('zabira_user', JSON.stringify(userData))
     setUser(userData)
     return userData
   }
 
-  const logout = () => {
-    localStorage.removeItem('zabira_token')
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout')
+    } catch {
+      // Si falla el servidor, de todas formas limpiamos localmente
+    }
     localStorage.removeItem('zabira_user')
     setUser(null)
   }

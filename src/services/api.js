@@ -2,25 +2,17 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
-  headers: { 'Content-Type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true  // enviar y recibir cookies httpOnly en cada request
 })
 
-// Adjuntar token automáticamente en cada request
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('zabira_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
-
-// Manejar 401 globalmente (token expirado)
+// Manejar 401 globalmente (cookie expirada / inválida)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('zabira_token')
-      localStorage.removeItem('zabira_user')
+      // No hay nada que limpiar en localStorage; el servidor ya
+      // invalida la cookie al responder 401
       window.location.href = '/login'
     }
     return Promise.reject(error)

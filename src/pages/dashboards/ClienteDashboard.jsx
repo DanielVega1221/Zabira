@@ -63,8 +63,8 @@ export default function ClienteDashboard() {
     }
   }, [pagoMsg, cargarDatos])
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     navigate('/', { replace: true })
   }
 

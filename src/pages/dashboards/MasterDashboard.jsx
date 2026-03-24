@@ -541,7 +541,7 @@ export default function MasterDashboard() {
     init()
   }, [])
 
-  const handleLogout = () => { logout(); navigate('/', { replace: true }) }
+  const handleLogout = async () => { await logout(); navigate('/', { replace: true }) }
 
   const formatFecha = fecha =>
     new Date(fecha).toLocaleString('es-AR', { dateStyle: 'medium', timeStyle: 'short' })
