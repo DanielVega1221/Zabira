@@ -7,12 +7,17 @@ const api = axios.create({
 })
 
 // Manejar 401 globalmente (cookie expirada / inválida)
+// Solo redirigir si el usuario estaba en una ruta protegida,
+// no en páginas públicas (evita loop al verificar la cookie en /login, /, etc.)
+const RUTAS_PUBLICAS = ['/', '/login', '/registro', '/pre-login']
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // No hay nada que limpiar en localStorage; el servidor ya
-      // invalida la cookie al responder 401
+    if (
+      error.response?.status === 401 &&
+      !RUTAS_PUBLICAS.includes(window.location.pathname)
+    ) {
       window.location.href = '/login'
     }
     return Promise.reject(error)

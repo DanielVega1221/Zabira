@@ -1766,6 +1766,25 @@
   padding: 10px 14px;
 }
 
+.auth-form__rules {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.auth-form__rule {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.auth-form__rule--ok  { color: #27ae60; }
+.auth-form__rule--fail { color: #888; }
+
 .auth-form__btn {
   font-family: var(--font-body);
   font-size: 14px;

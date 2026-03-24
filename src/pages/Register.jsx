@@ -24,6 +24,15 @@ export default function Register() {
     setError('')
   }
 
+  // Requisitos de contraseña — coinciden exactamente con la validación del backend
+  const passwordRules = [
+    { label: 'Mínimo 8 caracteres',   ok: form.password.length >= 8 },
+    { label: 'Al menos una mayúscula', ok: /[A-Z]/.test(form.password) },
+    { label: 'Al menos una minúscula', ok: /[a-z]/.test(form.password) },
+    { label: 'Al menos un número',     ok: /\d/.test(form.password) },
+  ]
+  const passwordValida = passwordRules.every(r => r.ok)
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -31,8 +40,8 @@ export default function Register() {
     if (form.password !== form.confirmar) {
       return setError('Las contraseñas no coinciden')
     }
-    if (form.password.length < 6) {
-      return setError('La contraseña debe tener al menos 6 caracteres')
+    if (!passwordValida) {
+      return setError('La contraseña no cumple los requisitos indicados')
     }
 
     setLoading(true)
@@ -137,11 +146,20 @@ export default function Register() {
                 name="password"
                 type="password"
                 autoComplete="new-password"
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Mín. 8 caracteres, mayúscula y número"
                 value={form.password}
                 onChange={handleChange}
                 required
               />
+              {form.password.length > 0 && (
+                <ul className="auth-form__rules">
+                  {passwordRules.map(r => (
+                    <li key={r.label} className={`auth-form__rule ${r.ok ? 'auth-form__rule--ok' : 'auth-form__rule--fail'}`}>
+                      <span aria-hidden="true">{r.ok ? '✓' : '×'}</span> {r.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             <div className="auth-form__field">
